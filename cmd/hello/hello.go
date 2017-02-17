@@ -16,6 +16,8 @@ import (
 	"github.com/c4milo/hello-nyt/config"
 	"github.com/c4milo/hello-nyt/static"
 	"github.com/golang/glog"
+
+	_ "expvar"
 )
 
 var (
@@ -53,7 +55,8 @@ func main() {
 		grpcutil.WithPort(config.Port),
 		grpcutil.WithServices(services),
 		// We could extend more the hello gRPC service by adding token verification
-		// using gRPC interceptors.
+		// using gRPC interceptors. We could also add more vars to expvar in order
+		// to gather stats about the gRPC calls.
 		// grpcutil.WithServerOpts([]grpc.ServerOption{
 		// 	grpc.UnaryInterceptor(identity.UnaryInterceptor()),
 		// }),
@@ -67,6 +70,16 @@ func main() {
 	handler := static.Handler(http.DefaultServeMux)
 	// Handles gRPC and OpenAPI requests
 	handler = grpcutil.Handler(handler, options...)
+	// Handles health requests
+	handler = func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/health" {
+				http.Redirect(w, r, "/debug/vars", http.StatusTemporaryRedirect)
+				return
+			}
+			h.ServeHTTP(w, r)
+		})
+	}(handler)
 	// Handles logging for OpenAPI requests as well as static assets requests
 	handler = logger.Handler(handler, logger.AppName(appName))
 

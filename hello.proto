@@ -13,12 +13,6 @@ service Hello {
 			get: "/hello/{name=*}"
 		};
 	}
-	// Health reports service health status.
-	rpc Health(google.protobuf.Empty) returns (HealthResponse) {
-		option (google.api.http) = {
-			get: "/health"
-		};
-	}
 
 	rpc Counts(google.protobuf.Empty) returns (CountsResponse) {
 		option (google.api.http) = {
@@ -33,9 +27,6 @@ service Hello {
 	}
 
 }
-
-// HealthRsponse contains the service health stats.
-message HealthResponse {}
 
 message Count {
 	string name = 1;

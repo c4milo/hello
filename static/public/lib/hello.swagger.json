@@ -45,23 +45,6 @@
         ]
       }
     },
-    "/health": {
-      "get": {
-        "summary": "Health reports service health status.",
-        "operationId": "Health",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/helloHealthResponse"
-            }
-          }
-        },
-        "tags": [
-          "Hello"
-        ]
-      }
-    },
     "/hello/{name}": {
       "get": {
         "summary": "SayHi greets a given name.",
@@ -114,10 +97,6 @@
         }
       },
       "title": "CountsResponse contains a list of"
-    },
-    "helloHealthResponse": {
-      "type": "object",
-      "description": "HealthRsponse contains the service health stats."
     },
     "helloSayHiRequest": {
       "type": "object",
