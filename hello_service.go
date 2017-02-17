@@ -30,17 +30,13 @@ func (s *service) SayHi(ctx context.Context, r *SayHiRequest) (*SayHiResponse, e
 	// counter in a goroutine instead since sending the greeting message does not rely on it.
 	s.counter.Lock()
 	defer s.counter.Unlock()
-	name := r.Name
 
+	name := r.Name
 	s.counter.m[name]++
 
 	return &SayHiResponse{
-		Greeting: fmt.Sprintf("Hello, %s!", r.Name),
+		Greeting: fmt.Sprintf("Hello, %s!", name),
 	}, nil
-}
-
-func (s *service) Health(ctx context.Context, r *empty.Empty) (*HealthResponse, error) {
-	return nil, grpc.Errorf(codes.Unimplemented, "nothing to see here")
 }
 
 func (s *service) Counts(ctx context.Context, r *empty.Empty) (*CountsResponse, error) {
@@ -77,7 +73,7 @@ func (s *service) DeleteCounts(ctx context.Context, r *empty.Empty) (*empty.Empt
 // RegisterService registers service with a given GRPC server.
 func RegisterService(binding grpcutil.ServiceBinding) error {
 	// Creates a new service instance and injects gRPC clients for dependent services
-	service := &service{
+	s := &service{
 		counter: &counter{
 			m: make(map[string]uint64),
 		},
@@ -86,7 +82,7 @@ func RegisterService(binding grpcutil.ServiceBinding) error {
 	}
 
 	// Registers GRPC service.
-	RegisterHelloServer(binding.GRPCServer, service)
+	RegisterHelloServer(binding.GRPCServer, s)
 
 	// Registers HTTP endpoint in GRPC Gateway Muxer. Enabling OpenAPI.
 	return RegisterHelloHandler(context.Background(), binding.GRPCGatewayMuxer, binding.GRPCGatewayClient)
