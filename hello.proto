@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package hello;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// gSync implements a hello service with health endoint to check service health.
+service Hello {
+	// SayHi greets a given name.
+	rpc SayHi(SayHiRequest) returns (SayHiResponse) {
+		option (google.api.http) = {
+			get: "/hello/{name=*}"
+		};
+	}
+	// Health reports service health status.
+	rpc Health(google.protobuf.Empty) returns (HealthResponse) {
+		option (google.api.http) = {
+			get: "/health"
+		};
+	}
+
+	rpc Counts(google.protobuf.Empty) returns (CountsResponse) {
+		option (google.api.http) = {
+			get: "/counts"
+		};
+	}
+
+	rpc DeleteCounts(google.protobuf.Empty) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			delete: "/counts"
+		};
+	}
+
+}
+
+// HealthRsponse contains the service health stats.
+message HealthResponse {}
+
+message Count {
+	string name = 1;
+	uint64 count = 2;
+}
+
+// CountsResponse contains a list of
+message CountsResponse {
+	repeated Count counts = 1;
+}
+
+// SayHiRequest contains the name of the person to send the greeting to.
+message SayHiRequest {
+	// Name is the name of the person to greet.
+	string name = 1;
+}
+
+// SayHiResponse returns a greeting message.
+message SayHiResponse {
+	// Greeting is the actual message.
+	string greeting = 1;
+}

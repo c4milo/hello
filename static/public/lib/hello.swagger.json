@@ -1,0 +1,150 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "hello.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/counts": {
+      "get": {
+        "operationId": "Counts",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/helloCountsResponse"
+            }
+          }
+        },
+        "tags": [
+          "Hello"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteCounts",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protobufEmpty"
+            }
+          }
+        },
+        "tags": [
+          "Hello"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health reports service health status.",
+        "operationId": "Health",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/helloHealthResponse"
+            }
+          }
+        },
+        "tags": [
+          "Hello"
+        ]
+      }
+    },
+    "/hello/{name}": {
+      "get": {
+        "summary": "SayHi greets a given name.",
+        "operationId": "SayHi",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/helloSayHiResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "Hello"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "helloCount": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "count": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "helloCountsResponse": {
+      "type": "object",
+      "properties": {
+        "counts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/helloCount"
+          }
+        }
+      },
+      "title": "CountsResponse contains a list of"
+    },
+    "helloHealthResponse": {
+      "type": "object",
+      "description": "HealthRsponse contains the service health stats."
+    },
+    "helloSayHiRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "format": "string",
+          "description": "Name is the name of the person to greet."
+        }
+      },
+      "description": "SayHiRequest contains the name of the person to send the greeting to."
+    },
+    "helloSayHiResponse": {
+      "type": "object",
+      "properties": {
+        "greeting": {
+          "type": "string",
+          "format": "string",
+          "description": "Greeting is the actual message."
+        }
+      },
+      "description": "SayHiResponse returns a greeting message."
+    },
+    "protobufEmpty": {
+      "type": "object",
+      "description": "service Foo {\n      rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);\n    }\n\nThe JSON representation for `Empty` is empty JSON object `{}`.",
+      "title": "A generic empty message that you can re-use to avoid defining duplicated\nempty messages in your APIs. A typical example is to use it as the request\nor the response type of an API method. For instance:"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "hello-nyt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/index.js",
+  "scripts": {
+    "start": "webpack-dev-server --port 8888 --progress --inline --hot --content-base public/ --history-api-fallback"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^6.7.3",
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {}
+}
