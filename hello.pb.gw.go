@@ -55,15 +55,6 @@ func request_Hello_SayHi_0(ctx context.Context, marshaler runtime.Marshaler, cli
 
 }
 
-func request_Hello_Health_0(ctx context.Context, marshaler runtime.Marshaler, client HelloClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq empty.Empty
-	var metadata runtime.ServerMetadata
-
-	msg, err := client.Health(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
 func request_Hello_Counts_0(ctx context.Context, marshaler runtime.Marshaler, client HelloClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq empty.Empty
 	var metadata runtime.ServerMetadata
@@ -140,34 +131,6 @@ func RegisterHelloHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc
 
 	})
 
-	mux.Handle("GET", pattern_Hello_Health_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		if cn, ok := w.(http.CloseNotifier); ok {
-			go func(done <-chan struct{}, closed <-chan bool) {
-				select {
-				case <-done:
-				case <-closed:
-					cancel()
-				}
-			}(ctx.Done(), cn.CloseNotify())
-		}
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, req)
-		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
-		}
-		resp, md, err := request_Hello_Health_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_Hello_Health_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_Hello_Counts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -230,8 +193,6 @@ func RegisterHelloHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc
 var (
 	pattern_Hello_SayHi_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"hello", "name"}, ""))
 
-	pattern_Hello_Health_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"health"}, ""))
-
 	pattern_Hello_Counts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"counts"}, ""))
 
 	pattern_Hello_DeleteCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"counts"}, ""))
@@ -239,8 +200,6 @@ var (
 
 var (
 	forward_Hello_SayHi_0 = runtime.ForwardResponseMessage
-
-	forward_Hello_Health_0 = runtime.ForwardResponseMessage
 
 	forward_Hello_Counts_0 = runtime.ForwardResponseMessage
 
