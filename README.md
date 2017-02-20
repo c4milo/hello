@@ -3,7 +3,7 @@
 Hello API exposes a simple service over gRPC and OpenAPI to record visitors and visits.
 
 
-## Prerequesites
+## Prerequisites
 
 * gcloud CLI
 * Docker
