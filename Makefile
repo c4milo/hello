@@ -1,7 +1,7 @@
 NAME := hello
-VERSION := v1.0.0
+VERSION := v1.0.8
 LDFLAGS := -ldflags "-X main.Version=$(VERSION) -X main.AppName=$(NAME)"
-BLDTAGS := -tags ""
+BLDTAGS := -tags "dev"
 DEVTAGS := -tags "dev"
 
 PROTOC = /usr/local/bin/protoc
@@ -12,7 +12,7 @@ help: ## Shows this help text
 generate: ## Builds and embeds web app in Go binary.
 	go generate static/static.go
 
-protoc: ## Generates gRPC code
+protoc: ## Generates gRPC code from protobuffers file
 	$(PROTOC) -I. \
 	-I$(GOPATH)/src \
 	-I$(GOPATH)/src/github.com \
@@ -21,20 +21,22 @@ protoc: ## Generates gRPC code
 	--swagger_out=logtostderr=true:static/public/lib \
 	--go_out=Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:. $(NAME).proto
 
-testrace: migrations ## Runs all tests with race detector
-	go test $(DEVTAGS) -parallel 2 -race ./...
-
 dev: protoc generate ## Builds a dev binary for local testing.
 	go build $(DEVTAGS) $(LDFLAGS) -o $(NAME) cmd/$(NAME)/$(NAME).go
 
 clean: ## Cleans object files
 	go clean $(DEVTAGS) $(LDFLAGS)
 
-build: protoc ## Generates a build for linux and darwin into build/ folder
+deps: ## Installs dev dependencies
+	go get -u -v github.com/mitchellh/gox
+	go get -u -v github.com/c4milo/github-release
+	go get -u github.com/kardianos/govendor
+
+build: protoc generate ## Generates a build for linux and darwin into build/ folder
 	@rm -rf build/
 	@gox $(BLDTAGS) $(LDFLAGS) \
-	-os="darwin" \
-	-os="linux" \
+	-osarch="darwin/amd64" \
+	-osarch="linux/amd64" \
 	-output "build/{{.Dir}}_$(VERSION)_{{.OS}}_{{.Arch}}/$(NAME)" \
 	./...
 
@@ -55,14 +57,19 @@ release: test dist ## Generates a release in Github and uploads artifacts.
 	comparison="$$latest_tag..HEAD"; \
 	if [ -z "$$latest_tag" ]; then comparison=""; fi; \
 	changelog=$$(git log $$comparison --oneline --no-merges --reverse); \
-	github-release hooklift/$(NAME) $(VERSION) "$$(git rev-parse --abbrev-ref HEAD)" "**Changelog**<br/>$$changelog" 'dist/*'; \
+	github-release c4milo/$(NAME) $(VERSION) "$$(git rev-parse --abbrev-ref HEAD)" "**Changelog**<br/>$$changelog" 'dist/*'; \
 	git pull
+
+image-build: dist ## Builds a Docker container for the current version of the service.
+	docker build . --build-arg NAME="$(NAME)" --build-arg VERSION="$(VERSION)" -t gcr.io/nyt-interview-camilo-aguilar/hello:$(VERSION) -t gcr.io/nyt-interview-camilo-aguilar/hello:latest
+
+image-push: build-image ## Pushes Docker image to Google's Container Registry
+	gcloud docker -- push gcr.io/nyt-interview-camilo-aguilar/hello:$(VERSION)
 
 devcerts: ## Generates dev TLS certificates
 	openssl ecparam -genkey -name secp384r1 -out certs/server-key.pem && \
 	openssl req -new -x509 -key certs/server-key.pem -out certs/server.pem -days 36000
 
-
-.PHONY: help dev build protoc install deps dist release
+.PHONY: help dev build protoc install deps dist release image-build image-push
 
 .DEFAULT_GOAL := help
