@@ -5,35 +5,37 @@ package hello;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-// gSync implements a hello service with health endoint to check service health.
+// Hello implements a hello service.
 service Hello {
-	// SayHi greets a given name.
+	// SayHi greets a given name and records her visit.
 	rpc SayHi(SayHiRequest) returns (SayHiResponse) {
 		option (google.api.http) = {
 			get: "/hello/{name=*}"
 		};
 	}
 
+	// Counts returns the number of visitors recorded.
 	rpc Counts(google.protobuf.Empty) returns (CountsResponse) {
 		option (google.api.http) = {
 			get: "/counts"
 		};
 	}
 
+	// DeleteCounts resets the in-memory map that keeps track of visitors and number of visits.
 	rpc DeleteCounts(google.protobuf.Empty) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/counts"
 		};
 	}
-
 }
 
+// Count contains the visitor name and her number of visits.
 message Count {
 	string name = 1;
 	uint64 count = 2;
 }
 
-// CountsResponse contains a list of
+// CountsResponse contains a list of visitors and visits.
 message CountsResponse {
 	repeated Count counts = 1;
 }
