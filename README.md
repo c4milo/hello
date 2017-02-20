@@ -31,11 +31,12 @@ curl -v --insecure -X DELETE -H "Accept: application/json" https://localhost:999
 
 * I used gRPC and Open API to generate the service from `hello.proto` and implemented `hello_service.go` and `hello_service_test.go`
 * I added Swagger UI to make it more convenient to explore the HTTP API.
-* The total effort, including tests, docs and deployment was roughly 4 hours. Most of the time was spent dealing with GCP.
 * Third-party dependencies are kept to the minimum possible.
 * The API also supports HTTP2 and TLS 1.2
 * A very minimal `Dockerfile` was also added.
 * Releasing a binary of the service was automated with Github Releases: https://github.com/c4milo/hello/releases
+* Dependencies are vendored using `govendor`
+* The total effort, including tests, docs and deployment was roughly 4 hours. Most of the time was spent dealing with GCP.
 
 ## Deployment
 
@@ -54,8 +55,7 @@ In order to deploy changes follow these steps:
 * Add compression
 * Add rate limiting
 * Add LetsEncrypt certificate and schedule K8S to periodically renew the certificate.
-* Add domain name
-
+* Use domain name instead of IP address to access the service.
 
 ## Issues I ran across
 
