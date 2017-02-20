@@ -38,6 +38,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+// Count contains the visitor name and her number of visits.
 type Count struct {
 	Name  string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Count uint64 `protobuf:"varint,2,opt,name=count" json:"count,omitempty"`
@@ -62,7 +63,7 @@ func (m *Count) GetCount() uint64 {
 	return 0
 }
 
-// CountsResponse contains a list of
+// CountsResponse contains a list of visitors and visits.
 type CountsResponse struct {
 	Counts []*Count `protobuf:"bytes,1,rep,name=counts" json:"counts,omitempty"`
 }
@@ -133,9 +134,11 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for Hello service
 
 type HelloClient interface {
-	// SayHi greets a given name.
+	// SayHi greets a given name and records her visit.
 	SayHi(ctx context.Context, in *SayHiRequest, opts ...grpc.CallOption) (*SayHiResponse, error)
+	// Counts returns the number of visitors recorded.
 	Counts(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*CountsResponse, error)
+	// DeleteCounts resets the in-memory map that keeps track of visitors and number of visits.
 	DeleteCounts(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
 }
 
@@ -177,9 +180,11 @@ func (c *helloClient) DeleteCounts(ctx context.Context, in *google_protobuf1.Emp
 // Server API for Hello service
 
 type HelloServer interface {
-	// SayHi greets a given name.
+	// SayHi greets a given name and records her visit.
 	SayHi(context.Context, *SayHiRequest) (*SayHiResponse, error)
+	// Counts returns the number of visitors recorded.
 	Counts(context.Context, *google_protobuf1.Empty) (*CountsResponse, error)
+	// DeleteCounts resets the in-memory map that keeps track of visitors and number of visits.
 	DeleteCounts(context.Context, *google_protobuf1.Empty) (*google_protobuf1.Empty, error)
 }
 

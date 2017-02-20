@@ -17,6 +17,7 @@
   "paths": {
     "/counts": {
       "get": {
+        "summary": "Counts returns the number of visitors recorded.",
         "operationId": "Counts",
         "responses": {
           "200": {
@@ -31,6 +32,7 @@
         ]
       },
       "delete": {
+        "summary": "DeleteCounts resets the in-memory map that keeps track of visitors and number of visits.",
         "operationId": "DeleteCounts",
         "responses": {
           "200": {
@@ -47,7 +49,7 @@
     },
     "/hello/{name}": {
       "get": {
-        "summary": "SayHi greets a given name.",
+        "summary": "SayHi greets a given name and records her visit.",
         "operationId": "SayHi",
         "responses": {
           "200": {
@@ -84,7 +86,8 @@
           "type": "string",
           "format": "uint64"
         }
-      }
+      },
+      "description": "Count contains the visitor name and her number of visits."
     },
     "helloCountsResponse": {
       "type": "object",
@@ -96,7 +99,7 @@
           }
         }
       },
-      "title": "CountsResponse contains a list of"
+      "description": "CountsResponse contains a list of visitors and visits."
     },
     "helloSayHiRequest": {
       "type": "object",
