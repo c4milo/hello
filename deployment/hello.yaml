@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello
+    spec:
+      containers:
+      - name: hello
+        image: gcr.io/nyt-interview-camilo-aguilar/hello:v1.0.8
+        ports:
+        - containerPort: 9999
+        - containerPort: 9998
+        env:
+        - name: TLS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: hello-secrets
+              key: tls.key
+        - name: TLS_CERT
+          valueFrom:
+            secretKeyRef:
+              name: hello-secrets
+              key: tls.cert
+        - name: PRIMARY_DOMAIN
+          value: 35.185.24.220
+        livenessProbe:
+          httpGet:
+            path: /debug/vars
+            port: 9999
+            scheme: HTTPS
+            httpHeaders:
+              - name: Accept
+                value: text/html
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /debug/vars
+            scheme: HTTPS
+            port: 9999
+            httpHeaders:
+              - name: Accept
+                value: text/html
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
