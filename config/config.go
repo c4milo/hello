@@ -3,14 +3,18 @@ package config
 import (
 	"os"
 
+	"net"
+
 	"github.com/golang/glog"
 )
 
 var (
 	// PrimaryDomain is the main DNS name used to access this service.
 	PrimaryDomain string
-	// Port is the TCP port on which this service will accept connections.
+	// Port is the TCP port on which this service will accept unsecured connections
 	Port string
+	// TLSPort is the secured port to access the service
+	TLSPort string
 	// TLSCert is the PEM encoded value of the TLS certificate
 	TLSCert string
 	// TLSKey is the PEM encoded value of the TLS private key used to generate the certificate
@@ -21,13 +25,19 @@ var (
 func Read() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "9999"
+		port = "9998"
 	}
 	Port = port
 
+	tlsPort := os.Getenv("TLS_PORT")
+	if tlsPort == "" {
+		tlsPort = "9999"
+	}
+	TLSPort = tlsPort
+
 	PrimaryDomain = os.Getenv("PRIMARY_DOMAIN")
 	if PrimaryDomain == "" {
-		PrimaryDomain = "localhost:" + Port
+		PrimaryDomain = net.JoinHostPort("localhost", tlsPort)
 	}
 
 	// For development purposes, use the following to regenerate key:
