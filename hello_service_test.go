@@ -67,7 +67,7 @@ func TestCounts(t *testing.T) {
 	}{
 		{
 			"it returns an error when no counts are found",
-			map[string]uint64{}, grpc.Errorf(codes.NotFound, "there is no visits recorded at this moment"),
+			map[string]uint64{}, grpc.Errorf(codes.NotFound, "no visits recorded at this moment"),
 		},
 		{
 			"it returns counts successfully",
