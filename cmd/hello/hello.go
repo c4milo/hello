@@ -28,16 +28,24 @@ var (
 )
 
 func init() {
+	// Sets glog flag to log messages to stderr as well.
 	flag.Set("logtostderr", "true")
+
+	// Parses any flags passed to the command line
 	flag.Parse()
+
+	// Reads environment variables configuring the service.
 	config.Read()
 }
 
 func main() {
+	// Listens for SIGINT signals in order to gracefully shutdown the service.
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
 
 	appName := AppName + "-" + Version
+
+	// Makes sure to flush any pending IO before shutting down service.
 	defer glog.Flush()
 
 	// GRPC services
@@ -52,7 +60,7 @@ func main() {
 
 	options := []grpcutil.Option{
 		grpcutil.WithTLSCert(&tlsKeyPair),
-		grpcutil.WithPort(config.Port),
+		grpcutil.WithPort(config.TLSPort),
 		grpcutil.WithServices(services),
 		// We could extend more the hello gRPC service by adding token verification
 		// using gRPC interceptors. We could also add more vars to expvar in order
@@ -65,7 +73,8 @@ func main() {
 		grpcutil.WithSkipPath(fmt.Sprintf("/lib/%s.swagger.json", AppName)),
 	}
 
-	// These middlewares are invoked bottom up and the order matters.
+	// The following middlewares are invoked bottom up and the order matters.
+
 	// Serves single page app and web static assets such as images, stylecheets and fonts.
 	handler := static.Handler(http.DefaultServeMux)
 	// Handles gRPC and OpenAPI requests
@@ -83,9 +92,10 @@ func main() {
 	// Handles logging for OpenAPI requests as well as static assets requests
 	handler = logger.Handler(handler, logger.AppName(appName))
 
+	tlsAddress := ":" + config.TLSPort
 	address := ":" + config.Port
 	srv := &http.Server{
-		Addr:    address,
+		Addr:    tlsAddress,
 		Handler: handler,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{tlsKeyPair},
@@ -94,14 +104,25 @@ func main() {
 	}
 
 	go func() {
-		glog.Infof("Starting server at %s", address)
+		glog.Infof("Starting HTTPS server at %s", tlsAddress)
 		if err := srv.ListenAndServeTLS("", ""); err != nil {
 			glog.Errorf("ListenAndServeTLS: %v", err)
 		}
 	}()
-	<-stopChan // wait for SIGINT
 
-	// shut down gracefully, but waits no longer than 5 seconds before shutting down the service.
+	go func() {
+		glog.Infof("Starting HTTP server at %s", address)
+		if err := http.ListenAndServe(address, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			url := "https://" + config.PrimaryDomain + r.RequestURI
+			glog.Infof("redirecting to %s", url)
+			http.Redirect(w, r, url, http.StatusPermanentRedirect)
+		})); err != nil {
+			glog.Errorf("ListenAndServe: %v", err)
+		}
+	}()
+	<-stopChan // wait for SIGINT signal
+
+	// shut down gracefully, waiting 5 seconds for any established connection to finish before shutting down the service.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	srv.Shutdown(ctx)
