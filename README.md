@@ -5,7 +5,7 @@ Hello API exposes a simple service over gRPC and OpenAPI to record visitors and 
 
 ## Prerequesites
 
-* gcloud
+* gcloud CLI
 * Docker
 * Go 1.8
 
@@ -18,8 +18,8 @@ Run `make help` or `make`
 
 The API can be explored by pointing your browser to [https://localhost:9999/#/Hello](https://localhost:9999/#/Hello).
 
-When using `curl`, an Accept header specifying `application/json` is required in order to hit the API. Otherwise, it is going to
-attempt to serve a static asset.
+When using `curl`, an Accept header specifying `application/json` is required in order to hit the HTTP API. Otherwise, it is going to
+attempt to serve Swagger UI.
 
 ```shell
 curl --insecure -H "Accept: application/json" https://localhost:9999/hello/camilo | jq .
@@ -35,7 +35,7 @@ curl -v --insecure -X DELETE -H "Accept: application/json" https://localhost:999
 * Third-party dependencies are kept to the minimum possible.
 * The API also supports HTTP2 and TLS 1.2
 * A very minimal `Dockerfile` was also added.
-* Releasing a binary of the service was automated with Github Releases.
+* Releasing a binary of the service was automated with Github Releases: https://github.com/c4milo/hello/releases
 
 ## Deployment
 
@@ -57,7 +57,7 @@ In order to deploy changes follow the following steps:
 * Add domain name
 
 
-## Issue I ran across
+## Issues I ran across
 
-* I spent a good deal of time trying to fix an authentication issue with gcloud as I had a previous configuration before.
+* I spent a good deal of time trying to fix an authentication issue with gcloud as I had a previous project configured before.
 * K8s does not seem to be able to register service health checks in GCP's network load balancer
