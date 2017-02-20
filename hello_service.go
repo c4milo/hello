@@ -12,7 +12,7 @@ import (
 )
 
 type counter struct {
-	// maps are not safe for concurrent access in Go, so we need to synchronize them with a mutex.
+	// maps are not safe for concurrent access in Go, so we need to synchronize access with a mutex.
 	sync.RWMutex
 	m map[string]uint64
 }
@@ -27,7 +27,7 @@ func (s *service) SayHi(ctx context.Context, r *SayHiRequest) (*SayHiResponse, e
 	}
 
 	// If there is any concern for lock contention during high traffic, we can increase the
-	// counter in a goroutine instead since sending the greeting message does not rely on it.
+	// counter in a goroutine instead, since sending the greeting message does not rely on it.
 	s.counter.Lock()
 	defer s.counter.Unlock()
 
@@ -44,7 +44,7 @@ func (s *service) Counts(ctx context.Context, r *empty.Empty) (*CountsResponse, 
 	defer s.counter.RUnlock()
 
 	if len(s.counter.m) == 0 {
-		return nil, grpc.Errorf(codes.NotFound, "there is no visits recorded at this moment")
+		return nil, grpc.Errorf(codes.NotFound, "no visits recorded at this moment")
 	}
 
 	res := new(CountsResponse)
@@ -58,11 +58,10 @@ func (s *service) Counts(ctx context.Context, r *empty.Empty) (*CountsResponse, 
 }
 
 func (s *service) DeleteCounts(ctx context.Context, r *empty.Empty) (*empty.Empty, error) {
-	// We lock the map just in case there is an in-flight request that we don't want to lose.
+	// We lock the map just in case there are in-flight requests we don't want to lose.
 	s.counter.Lock()
 	defer s.counter.Unlock()
 
-	// previous map allocated memory is freed by Go's garbage collector.
 	s.counter = &counter{
 		m: make(map[string]uint64),
 	}
@@ -77,8 +76,7 @@ func RegisterService(binding grpcutil.ServiceBinding) error {
 		counter: &counter{
 			m: make(map[string]uint64),
 		},
-		// gRPC services used within this service's logic or test mocks can also
-		// be injected here if needed.
+		// Any other service used within as well as test mocks can also be injected here if needed.
 	}
 
 	// Registers GRPC service.
