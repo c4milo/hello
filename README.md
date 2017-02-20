@@ -40,7 +40,7 @@ curl -v --insecure -X DELETE -H "Accept: application/json" https://localhost:999
 ## Deployment
 
 A GKE cluster was created using GCP's web console, only 1 replica is launched as the service is managing state locally.
-In order to deploy changes follow the following steps:
+In order to deploy changes follow these steps:
 
 1. Increase version number in [Makefile](https://github.com/c4milo/hello/tree/master/Makefile#L2)
 2. Increase version number in [deployment/hello.yaml](https://github.com/c4milo/hello/tree/master/deployment/hello.yaml#L14) accordingly.
