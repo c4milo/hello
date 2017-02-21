@@ -45,7 +45,7 @@ In order to deploy changes follow these steps:
 
 1. Increase version number in [Makefile](https://github.com/c4milo/hello/tree/master/Makefile#L2)
 2. Increase version number in [deployment/hello.yaml](https://github.com/c4milo/hello/tree/master/deployment/hello.yaml#L14) accordingly.
-3. Run `make push`
+3. Run `make image-push`
 4. Run `kubectl apply deployment/hello.yaml`
 5. Verify by visiting [https://35.185.24.220/#/Hello](https://35.185.24.220/#/Hello)
 
