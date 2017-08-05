@@ -22,7 +22,7 @@ protoc: ## Generates gRPC code from protobuffers file
 	-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 	--grpc-gateway_out=logtostderr=true:. \
 	--swagger_out=logtostderr=true:static/public/lib \
-	--go_out=Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:. $(NAME).proto
+	--go_out=plugins=grpc:. $(NAME).proto
 
 dev: protoc generate ## Builds a dev binary for local testing.
 	go build $(DEVTAGS) $(LDFLAGS) -o $(NAME) cmd/$(NAME)/$(NAME).go

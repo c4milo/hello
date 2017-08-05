@@ -51,3 +51,11 @@ message SayHiResponse {
 	// Greeting is the actual message.
 	string greeting = 1;
 }
+
+// Error returns API error details
+message Error {
+	string code = 1;
+	string message = 2;
+	uint32 status = 3;
+	string details = 4;
+}

@@ -64,8 +64,7 @@
             "name": "name",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "string"
+            "type": "string"
           }
         ],
         "tags": [
@@ -79,8 +78,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         },
         "count": {
           "type": "string",
@@ -101,23 +99,11 @@
       },
       "description": "CountsResponse contains a list of visitors and visits."
     },
-    "helloSayHiRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "format": "string",
-          "description": "Name is the name of the person to greet."
-        }
-      },
-      "description": "SayHiRequest contains the name of the person to send the greeting to."
-    },
     "helloSayHiResponse": {
       "type": "object",
       "properties": {
         "greeting": {
           "type": "string",
-          "format": "string",
           "description": "Greeting is the actual message."
         }
       },

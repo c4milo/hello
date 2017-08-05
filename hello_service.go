@@ -7,8 +7,8 @@ import (
 	"github.com/c4milo/handlers/grpcutil"
 	"github.com/golang/protobuf/ptypes/empty"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type counter struct {
@@ -44,7 +44,13 @@ func (s *service) Counts(ctx context.Context, r *empty.Empty) (*CountsResponse, 
 	defer s.counter.RUnlock()
 
 	if len(s.counter.m) == 0 {
-		return nil, grpc.Errorf(codes.NotFound, "no visits recorded at this moment")
+		// return nil, grpc.Errorf(codes.NotFound, "no visits recorded at this moment")
+		err := new(Error)
+		err.Status = uint32(codes.NotFound)
+		err.Message = "Visits counter is zero"
+		s := status.New(codes.NotFound, "no visits recorded")
+		d, _ := s.WithDetails(err)
+		return nil, d.Err()
 	}
 
 	res := new(CountsResponse)
